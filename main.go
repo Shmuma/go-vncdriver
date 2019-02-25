@@ -617,16 +617,17 @@ func PyObject_Repr(obj *C.PyObject) (string, bool) {
 func GoVNCDriver_VNCSession_close(self, args, kwds *C.PyObject) *C.PyObject {
 	nameC := new(*C.char)
 	if C.PyArg_ParseTuple_close(args, kwds, nameC) == 0 {
+        log.Info("no closing done due to no args")
 		return nil
 	}
 	name := C.GoString(*nameC)
 
 	if name == "" {
-		log.Debug("closing entire VNCSession")
+		log.Info("closing entire VNCSession")
 		cast := (*C.go_vncdriver_VNCSession_object)(unsafe.Pointer(self))
 		GoVNCDriver_VNCSession_c_dealloc(cast)
 	} else {
-		log.Debugf("closing %s connection in VNCSession", name)
+		log.Infof("closing %s connection in VNCSession", name)
 
 		batchLock.Lock()
 		defer batchLock.Unlock()
