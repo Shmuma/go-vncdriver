@@ -1,11 +1,13 @@
 package gymvnc
 
 import (
+    "os"
 	"fmt"
 	"net"
 	"sync"
 	"time"
     "runtime"
+    "runtime/pprof"
 
 	"github.com/juju/errors"
 	logging "github.com/op/go-logging"
@@ -15,6 +17,7 @@ import (
 var (
 	log = logging.MustGetLogger("gymvnc")
 	id  = 0
+    snapshot_idx = 0
 )
 
 type sessionMgr struct {
@@ -34,6 +37,14 @@ func NewSessionMgr() *sessionMgr {
 func (s *sessionMgr) Close() error {
 	close(s.Done)
 	return nil
+}
+
+func Snapshot(idx int) error {
+    f, _ := os.Create(fmt.Sprintf("/tmp/vnc-%02d-%03d.pprof", idx, snapshot_idx))
+    pprof.Lookup("heap").WriteTo(f, 1)
+    f.Close()
+    snapshot_idx += 1
+    return nil
 }
 
 type Region struct {
@@ -81,6 +92,7 @@ type VNCSession struct {
 }
 
 func NewVNCSession(name string, c VNCSessionConfig) *VNCSession {
+    Snapshot(0)
 	if c.QualityLevel == -1 {
 	} else if c.QualityLevel < 0 {
 		log.Warningf("[%s] Quality level %d requested, but valid values are betweeen 0 (worst) and 9 (best). Using 0 intead.", c.Address, c.QualityLevel)
@@ -135,6 +147,7 @@ func NewVNCSession(name string, c VNCSessionConfig) *VNCSession {
 	}
 	id++
 	session.start()
+    Snapshot(1)
 	return session
 }
 
@@ -186,10 +199,12 @@ func (c *VNCSession) Close() error {
 		// we can't auto-clean it up on error.
 		c.renderer.Close()
 	}
+    Snapshot(2)
     c.frontScreen = nil
     c.backScreen = nil
     runtime.GC()
     log.Info("Screens dereferenced")
+    Snapshot(3)
 	return nil
 }
 
