@@ -5,6 +5,7 @@ import (
 	"net"
 	"sync"
 	"time"
+    "runtime"
 
 	"github.com/juju/errors"
 	logging "github.com/op/go-logging"
@@ -187,6 +188,8 @@ func (c *VNCSession) Close() error {
 	}
     c.frontScreen = nil
     c.backScreen = nil
+    runtime.GC()
+    log.Info("Screens dereferenced")
 	return nil
 }
 
