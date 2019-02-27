@@ -6,11 +6,14 @@ import (
 	"sync"
 	"time"
     "runtime"
+    "net/http"
 
 	"github.com/juju/errors"
 	logging "github.com/op/go-logging"
 	"github.com/openai/go-vncdriver/vncclient"
 )
+
+import _ "net/http/pprof"
 
 var (
 	log = logging.MustGetLogger("gymvnc")
@@ -599,6 +602,9 @@ type VNCBatch struct {
 }
 
 func NewVNCBatch() *VNCBatch {
+    go func() {
+            log.Info(http.ListenAndServe("localhost:6060", nil))
+        }()
 	return &VNCBatch{
 		sessions: map[string]*VNCSession{},
 	}
