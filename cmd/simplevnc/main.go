@@ -15,19 +15,16 @@ type foo struct {
 }
 
 func main() {
-	f, err := os.Create("/tmp/profile-tight.pprof")
-	if err != nil {
-		panic(err)
-	}
-	pprof.StartCPUProfile(f)
-	defer pprof.StopCPUProfile()
+	f, err := os.Create("/tmp/profile-00.pprof")
+    pprof.Lookup("heap").WriteTo(f, 1)
+    f.Close()
 
 	gymvnc.ConfigureLogging()
 
 	batch := gymvnc.NewVNCBatch()
 	err = batch.Open("conn", gymvnc.VNCSessionConfig{
-		// Address:          "127.0.0.1:5900",
-		Address:          "3.public-devbox.sci.openai-tech.com:20000",
+		Address:          "127.0.0.1:5900",
+//		Address:          "3.public-devbox.sci.openai-tech.com:20000",
 		Password:         "openai",
 		Encoding:         "tight",
 		FineQualityLevel: 100,
@@ -36,14 +33,18 @@ func main() {
 		panic(err)
 	}
 
+	f, err = os.Create("/tmp/profile-01.pprof")
+    pprof.Lookup("heap").WriteTo(f, 1)
+    f.Close()
+
 	start := time.Now()
 	updates := 0
 	errs := 0
-	for i := 0; i < 200000; i++ {
+	for i := 0; i < 2000; i++ {
 		elapsed := time.Now().Sub(start)
 		if elapsed >= time.Duration(1)*time.Second {
 			delta := float64(elapsed / time.Second)
-			log.Printf("Received: updates=%.2f errs=%.2f", float64(updates)/delta, float64(errs)/delta)
+			log.Printf("Received: %d, updates=%.2f errs=%.2f", i, float64(updates)/delta, float64(errs)/delta)
 
 			start = time.Now()
 			updates = 0
@@ -61,6 +62,16 @@ func main() {
 		updates += len(updatesN["conn"])
 		time.Sleep(16 * time.Millisecond)
 	}
+	f, err = os.Create("/tmp/profile-02.pprof")
+    pprof.Lookup("heap").WriteTo(f, 1)
+    f.Close()
+
+    batch.Close("conn")
+
+    f, err = os.Create("/tmp/profile-03.pprof")
+    pprof.Lookup("heap").WriteTo(f, 1)
+    f.Close()
+
 
 	// f, err := os.Create("/tmp/hi.prof")
 	// if err != nil {
