@@ -188,6 +188,7 @@ func (c *VNCSession) Close() error {
 	}
     c.frontScreen = nil
     c.backScreen = nil
+    c.deferredUpdates = nil
     runtime.GC()
     log.Info("Screens dereferenced")
 	return nil
