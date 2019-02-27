@@ -71,12 +71,15 @@ import (
 	"sync"
 	"time"
 	"unsafe"
+    "net/http"
 
 	"github.com/juju/errors"
 	logging "github.com/op/go-logging"
 	"github.com/openai/go-vncdriver/gymvnc"
 	"github.com/openai/go-vncdriver/vncclient"
 )
+
+import _ "net/http/pprof"
 
 var (
 	log     = logging.MustGetLogger("go_vncdriver")
@@ -101,6 +104,10 @@ func init() {
 			fmt.Println("Error calling lsof: %v", err)
 		}
 	}
+
+    go func() {
+            fmt.Println(http.ListenAndServe("localhost:6060", nil))
+        }()
 }
 
 func setupOnce() {
