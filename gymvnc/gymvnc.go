@@ -5,6 +5,7 @@ import (
 	"net"
 	"sync"
 	"time"
+    "runtime"
 
 	"github.com/juju/errors"
 	logging "github.com/op/go-logging"
@@ -185,6 +186,8 @@ func (c *VNCSession) Close() error {
 		// we can't auto-clean it up on error.
 		c.renderer.Close()
 	}
+    runtime.GC()
+    log.Info("GC() run in Close()")
 	return nil
 }
 
