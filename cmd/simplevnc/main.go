@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+    "runtime"
 	"runtime/pprof"
 	"time"
 
@@ -15,6 +16,7 @@ type foo struct {
 }
 
 func main() {
+    runtime.GC()
 	f, err := os.Create("/tmp/profile-00.pprof")
     pprof.Lookup("heap").WriteTo(f, 1)
     f.Close()
@@ -33,6 +35,7 @@ func main() {
 		panic(err)
 	}
 
+    runtime.GC()
 	f, err = os.Create("/tmp/profile-01.pprof")
     pprof.Lookup("heap").WriteTo(f, 1)
     f.Close()
@@ -62,12 +65,14 @@ func main() {
 		updates += len(updatesN["conn"])
 		time.Sleep(16 * time.Millisecond)
 	}
+    runtime.GC()
 	f, err = os.Create("/tmp/profile-02.pprof")
     pprof.Lookup("heap").WriteTo(f, 1)
     f.Close()
 
     batch.Close("conn")
 
+    runtime.GC()
     f, err = os.Create("/tmp/profile-03.pprof")
     pprof.Lookup("heap").WriteTo(f, 1)
     f.Close()
