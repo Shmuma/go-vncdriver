@@ -107,6 +107,8 @@ func (g *VNCGL) Apply(updates []*vncclient.FramebufferUpdateMessage) {
 				rgba = colorsToImage(rect.X, rect.Y, rect.Width, rect.Height, enc.Colors)
 			case *vncclient.TightEncoding:
 				rgba = colorsToImage(rect.X, rect.Y, rect.Width, rect.Height, enc.Colors)
+			case *vncclient.CursorEncoding:
+				continue
 			default:
 				panic(errors.Errorf("BUG: unrecognized encoding: %+v", enc))
 			}
