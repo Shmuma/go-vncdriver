@@ -1007,3 +1007,23 @@ func (b byteIOReader) ReadByte() (byte, error) {
 	_, err := b.Read(b.buf[:])
 	return b.buf[0], err
 }
+
+
+type CursorEncoding struct {
+	b []byte
+}
+
+func (e *CursorEncoding) Type() int32 {
+	return -239
+}
+
+func (e *CursorEncoding) Size() int {
+	return len(e.b)
+}
+
+func (e *CursorEncoding) Read(c *ClientConn, rect *Rectangle, r io.Reader) (Encoding, error) {
+	sz := rect.Area()*int(c.PixelFormat.BPP)/8 + (int(rect.Width+7)/8)*int(rect.Height)
+	b := make([]byte, sz)
+	_, err := io.ReadFull(r, b)
+	return &CursorEncoding{b}, err
+}

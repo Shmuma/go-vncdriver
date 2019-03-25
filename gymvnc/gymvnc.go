@@ -514,6 +514,7 @@ func (c *VNCSession) connect(updates chan *vncclient.FramebufferUpdateMessage) e
 
 	encodings := []vncclient.Encoding{
 		encoding,
+		&vncclient.CursorEncoding{},
 	}
 	if c.config.QualityLevel != -1 {
 		encodings = append(encodings, vncclient.QualityLevel(c.config.QualityLevel))
