@@ -324,6 +324,8 @@ func (c *VNCSession) applyUpdate(update *vncclient.FramebufferUpdateMessage) err
 			bytes += c.applyRect(c.conn, rect, enc.Colors)
 		case *vncclient.TightEncoding:
 			bytes += c.applyRect(c.conn, rect, enc.Colors)
+        case *vncclient.CursorEncoding:
+            log.Info("CursorEncoding, ignored")
 		default:
 			return errors.Errorf("unsupported encoding: %T", enc)
 		}
