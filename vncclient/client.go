@@ -13,15 +13,9 @@ import (
 	"sync"
 	"unicode"
 
-    logging "github.com/op/go-logging"
 	"github.com/juju/errors"
 	"github.com/openai/go-vncdriver/flexzlib"
 )
-
-var (
-    log = logging.MustGetLogger("vncclient")
-)
-
 
 type ClientConn struct {
 	id int
