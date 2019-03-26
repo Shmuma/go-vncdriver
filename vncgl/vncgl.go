@@ -116,7 +116,7 @@ func (g *VNCGL) Apply(updates []*vncclient.FramebufferUpdateMessage) {
 			g.applyImage(rgba)
 		}
 	}
-	log.Debugf("Completed Apply: count=%d time=%v", count, time.Duration(time.Now().UnixNano()-start))
+	log.Infof("Completed Apply: count=%d time=%v", count, time.Duration(time.Now().UnixNano()-start))
 }
 
 func (g *VNCGL) applyImage(img *image.RGBA) {
