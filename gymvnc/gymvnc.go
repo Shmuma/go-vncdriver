@@ -512,6 +512,7 @@ func (c *VNCSession) connect(updates chan *vncclient.FramebufferUpdateMessage) e
 		return errors.Errorf("invalid encoding: %s", c.config.Encoding)
 	}
 
+    log.Info("Before creation of encoding")
 	encodings := []vncclient.Encoding{
 		encoding,
 //		&vncclient.CursorEncoding{},
