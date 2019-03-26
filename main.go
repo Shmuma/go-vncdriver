@@ -185,7 +185,7 @@ func GoVNCDriver_VNCSession_connect(self, args, kwds *C.PyObject) *C.PyObject {
 	fineQualityLevel := int(*fineQualityLevelC)
 	subsampleLevel := int(*subsampleLevelC)
 	startTimeout := int(*startTimeoutC)
-	hideCursor := bool(*hideCursorC)
+	hideCursor := bool(*hideCursorC != 0)
 	subscription, ok := convertSubscriptionPy(*subscriptionPy)
 	if !ok {
 		return nil
