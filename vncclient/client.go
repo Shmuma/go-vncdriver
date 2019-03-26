@@ -13,9 +13,15 @@ import (
 	"sync"
 	"unicode"
 
+    logging "github.com/op/go-logging"
 	"github.com/juju/errors"
 	"github.com/openai/go-vncdriver/flexzlib"
 )
+
+var (
+    log = logging.MustGetLogger("vncclient")
+)
+
 
 type ClientConn struct {
 	id int
@@ -279,7 +285,7 @@ func (c *ClientConn) PointerEvent(mask ButtonMask, x, y uint16) error {
 func (c *ClientConn) SetEncodings(encs []Encoding) error {
 	c.send.Lock()
 	defer c.send.Unlock()
-
+    log.Info("SetEncodings called")
 	data := make([]interface{}, 3+len(encs))
 	data[0] = uint8(2)
 	data[1] = uint8(0)
