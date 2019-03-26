@@ -94,7 +94,7 @@ func (g *VNCGL) Close() error {
 func (g *VNCGL) Apply(updates []*vncclient.FramebufferUpdateMessage) {
 	start := time.Now().UnixNano()
 	count := 0
-
+    log.Info("Apply called") 
 	for _, update := range updates {
 		for _, rect := range update.Rectangles {
 			count += 1
@@ -116,7 +116,7 @@ func (g *VNCGL) Apply(updates []*vncclient.FramebufferUpdateMessage) {
 			g.applyImage(rgba)
 		}
 	}
-	log.Errorf("Completed Apply: count=%d time=%v", count, time.Duration(time.Now().UnixNano()-start))
+	log.Debugf("Completed Apply: count=%d time=%v", count, time.Duration(time.Now().UnixNano()-start))
 }
 
 func (g *VNCGL) applyImage(img *image.RGBA) {
