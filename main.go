@@ -18,9 +18,9 @@ static int PyArg_ParseTuple_list_O(PyObject *args, PyObject **a) {
     return PyArg_ParseTuple(args, "O", &PyList_Type, a);
 }
 
-static int PyArg_ParseTuple_connect(PyObject *args, PyObject *kwds, char **name, char **address, char **password, char **encoding, int *quality_level, int *compress_level, int *fine_quality_level, int *subsample_level, unsigned long *start_timeout, PyObject **subscription) {
-    static char *kwlist[] = {"name", "address", "password", "encoding", "quality_level", "compress_level", "fine_quality_level", "subsample_level", "start_timeout", "subscription", NULL};
-    return PyArg_ParseTupleAndKeywords(args, kwds, "ss|ssiiiikO", kwlist, name, address, password, encoding, quality_level, compress_level, fine_quality_level, subsample_level, start_timeout, subscription);
+static int PyArg_ParseTuple_connect(PyObject *args, PyObject *kwds, char **name, char **address, char **password, char **encoding, int *quality_level, int *compress_level, int *fine_quality_level, int *subsample_level, unsigned long *start_timeout, int *hide_cursor, PyObject **subscription) {
+    static char *kwlist[] = {"name", "address", "password", "encoding", "quality_level", "compress_level", "fine_quality_level", "subsample_level", "start_timeout", "hide_cursor", "subscription", NULL};
+    return PyArg_ParseTupleAndKeywords(args, kwds, "ss|ssiiiikpO", kwlist, name, address, password, encoding, quality_level, compress_level, fine_quality_level, subsample_level, start_timeout, hide_cursor, subscription);
 }
 
 static int PyArg_ParseTuple_close(PyObject *args, PyObject *kwds, char **name) {
@@ -163,14 +163,16 @@ func GoVNCDriver_VNCSession_connect(self, args, kwds *C.PyObject) *C.PyObject {
 	fineQualityLevelC := new(C.int)
 	subsampleLevelC := new(C.int)
 	startTimeoutC := new(C.ulong)
+	hideCursorC := new(C.int)
 	subscriptionPy := new(*C.PyObject)
 
 	*compressLevelC = C.int(-1)
 	*qualityLevelC = C.int(-1)
 	*fineQualityLevelC = C.int(-1)
 	*subsampleLevelC = C.int(-1)
+	*hideCursorC = C.int(0)
 
-	if C.PyArg_ParseTuple_connect(args, kwds, nameC, addressC, passwordC, encodingC, qualityLevelC, compressLevelC, fineQualityLevelC, subsampleLevelC, startTimeoutC, subscriptionPy) == 0 {
+	if C.PyArg_ParseTuple_connect(args, kwds, nameC, addressC, passwordC, encodingC, qualityLevelC, compressLevelC, fineQualityLevelC, subsampleLevelC, startTimeoutC, hideCursorC, subscriptionPy) == 0 {
 		return nil
 	}
 
@@ -183,6 +185,7 @@ func GoVNCDriver_VNCSession_connect(self, args, kwds *C.PyObject) *C.PyObject {
 	fineQualityLevel := int(*fineQualityLevelC)
 	subsampleLevel := int(*subsampleLevelC)
 	startTimeout := int(*startTimeoutC)
+	hideCursor := bool(*hideCursorC)
 	subscription, ok := convertSubscriptionPy(*subscriptionPy)
 	if !ok {
 		return nil
@@ -208,6 +211,7 @@ func GoVNCDriver_VNCSession_connect(self, args, kwds *C.PyObject) *C.PyObject {
 		FineQualityLevel: fineQualityLevel,
 		SubsampleLevel:   subsampleLevel,
 		StartTimeout:     time.Duration(startTimeout) * time.Second,
+		HideCursor:		  hideCursor,
 
 		Subscription: subscription,
 	})

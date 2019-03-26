@@ -48,6 +48,7 @@ type VNCSessionConfig struct {
 	CompressLevel    int // 0-9, 9 being highest compression
 	FineQualityLevel int // 0-100, 100 being top quality
 	SubsampleLevel   int // 0-3, 3 being grayscale; 0 being full color
+	HideCursor bool
 
 	StartTimeout time.Duration
 	Subscription []Region
@@ -325,7 +326,7 @@ func (c *VNCSession) applyUpdate(update *vncclient.FramebufferUpdateMessage) err
 		case *vncclient.TightEncoding:
 			bytes += c.applyRect(c.conn, rect, enc.Colors)
         case *vncclient.CursorEncoding:
-            log.Info("CursorEncoding, ignored")
+            log.Debug("CursorEncoding, ignored")
 		default:
 			return errors.Errorf("unsupported encoding: %T", enc)
 		}
@@ -516,7 +517,6 @@ func (c *VNCSession) connect(updates chan *vncclient.FramebufferUpdateMessage) e
 
 	encodings := []vncclient.Encoding{
 		encoding,
-		&vncclient.CursorEncoding{},
 	}
 	if c.config.QualityLevel != -1 {
 		encodings = append(encodings, vncclient.QualityLevel(c.config.QualityLevel))
@@ -529,6 +529,10 @@ func (c *VNCSession) connect(updates chan *vncclient.FramebufferUpdateMessage) e
 	}
 	if c.config.SubsampleLevel != -1 {
 		encodings = append(encodings, vncclient.SubsampleLevel(c.config.SubsampleLevel))
+	}
+
+	if c.config.HideCursor {
+		encodings = append(encodings, &vncclient.CursorEncoding{})
 	}
 
 	err = conn.SetEncodings(encodings)
